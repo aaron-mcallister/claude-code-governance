@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Read(.env)",
+      "Read(.env.local)",
+      "Read(.env.production)",
+      "Read(.env.development)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.kube/**)",
+      "Read(~/.config/gh/**)",
+      "Edit(.claude/settings.json)",
+      "Edit(.claude/settings.local.json)",
+      "Edit(.claude/hooks/**)",
+      "Edit(.mcp.json)"
+    ],
+    "ask": [
+      "Bash(git push *)"
+    ],
+    "disableBypassPermissionsMode": "disable"
+  },
+  "allowManagedHooksOnly": true,
+  "allowedMcpServers": [
+    {
+      "serverUrl": "{{MCP_ALLOWED_URL}}"
+    }
+  ],
+  "allowManagedMcpServersOnly": true,
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "allowUnsandboxedCommands": false,
+    "filesystem": {
+      "denyRead": [
+        "~/.ssh",
+        "~/.aws",
+        "~/.gnupg",
+        "~/.kube",
+        "~/.config/gh"
+      ],
+      "denyWrite": [
+        "~/.ssh",
+        "~/.zshrc",
+        "~/.bashrc",
+        "~/.zprofile",
+        "~/.bash_profile"
+      ]
+    },
+    "network": {
+      "allowedDomains": [
+        "registry.npmjs.org",
+        "pypi.org",
+        "files.pythonhosted.org",
+        "github.com"
+      ],
+      "allowManagedDomainsOnly": true
+    }
+  },
+  "env": {
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "OTEL_METRICS_EXPORTER": "otlp",
+    "OTEL_LOGS_EXPORTER": "otlp",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "{{OTEL_ENDPOINT}}",
+    "OTEL_LOG_TOOL_DETAILS": "1",
+    "OTEL_LOG_MANAGED_SETTINGS": "1"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|Read|Edit|Write|MultiEdit|NotebookEdit|Glob|Grep|WebFetch|WebSearch|mcp__.*)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "{{PYTHON}}",
+            "args": [
+              "{{HOOK_DIR}}/ccg_guard.py"
+            ],
+            "timeout": 10,
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
+  },
+  "requiredMinimumVersion": "2.1.274",
+  "cleanupPeriodDays": 30
+}
