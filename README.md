@@ -17,7 +17,7 @@ as code:
 
 - **A policy template** (`policy/managed-settings.template.json`) with deny and ask rules, managed-only
   hooks and MCP servers, a required sandbox with a network allowlist, and telemetry.
-- **A guard hook** (`policy/hooks/ccg_guard.py`): one standard-library file, Python 3.9 compatible. It reads
+- **A guard hook** (`policy/hooks/ccg_guard.py`): one standard-library file, written to Python 3.9 syntax so it runs on stock macOS. It reads
   the tool call, and can only ever **ask or deny**. Malformed, oversized or unparseable input, and any
   internal error, end in a block.
 - **A linter** (`tools/ccg_lint.py`) with two modes. `managed` checks that a rendered policy still carries
