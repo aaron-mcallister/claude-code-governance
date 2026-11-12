@@ -43,5 +43,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # Install with lifecycle scripts off for the whole dependency tree, then run only the CLI package's own
+      # postinstall, which unpacks the native binary. Nothing else gets to execute install-time code.
       - run: npm install --prefix "$RUNNER_TEMP/cc" --ignore-scripts @anthropic-ai/claude-code@2.1.322
-      - run: sudo -E CCG_ALLOW_SYSTEM_WRITE=1 CCG_CLAUDE="$RUNNER_TEMP/cc/node_modules/.bin/claude" scripts/doctor_check.sh
+      - run: node "$RUNNER_TEMP/cc/node_modules/@anthropic-ai/claude-code/install.cjs"
+      - run: sudo CCG_ALLOW_SYSTEM_WRITE=1 CCG_CLAUDE="$RUNNER_TEMP/cc/node_modules/.bin/claude" scripts/doctor_check.sh
