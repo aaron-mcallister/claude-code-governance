@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Least privilege: these workflows only need to read the repository.
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.13"]
+    steps:
+      # Actions are pinned to a full commit SHA (version noted in the comment).
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: python -m pip install --upgrade pip setuptools
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: pytest
+      # The rendered policy must pass the linter for both operating systems.
+      - run: python scripts/render.py --os macos --otel-endpoint https://otel.corp.internal:4317 --mcp-url 'https://mcp.corp.internal/*' --out /tmp/macos.json && python tools/ccg_lint.py managed /tmp/macos.json --fail-on-warning
+      - run: python scripts/render.py --os linux --otel-endpoint https://otel.corp.internal:4317 --mcp-url 'https://mcp.corp.internal/*' --out /tmp/linux.json && python tools/ccg_lint.py managed /tmp/linux.json --fail-on-warning
+      - run: pip-audit -r requirements-dev.txt
+
+  # Runs the real `claude doctor` against the rendered policy. Kept as its own job and NOT part of the
+  # required checks at first: it installs a pinned copy of the CLI from npm, so treat a failure here as
+  # "look", not "block", until you have watched it for a few weeks.
+  doctor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: npm install --prefix "$RUNNER_TEMP/cc" --ignore-scripts @anthropic-ai/claude-code@2.1.322
+      - run: sudo -E CCG_ALLOW_SYSTEM_WRITE=1 CCG_CLAUDE="$RUNNER_TEMP/cc/node_modules/.bin/claude" scripts/doctor_check.sh

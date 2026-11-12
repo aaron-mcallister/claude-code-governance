@@ -1,0 +1,6 @@
+# The policy, the hook and the linter are the controls. Changes to them need an owner's review
+# (enforce with a ruleset: require a pull request and code owner review on main).
+/policy/        @aaron-mcallister
+/tools/         @aaron-mcallister
+/scripts/       @aaron-mcallister
+/.github/       @aaron-mcallister
