@@ -43,7 +43,7 @@ policy:
 
 1. Installing with `--ignore-scripts` also skips the package's own postinstall, so the native binary was never
    unpacked and `claude doctor` could not run. `doctor_check.sh` failed on the unexpected output instead of
-   reporting a false pass, which is the behaviour it was written for.
+   reporting a false pass, which is the behavior it was written for.
 2. `sudo -E` is ignored on the runner. It was harmless, and was removed.
 
 The fix keeps lifecycle scripts off for the whole dependency tree and runs only the CLI package's own

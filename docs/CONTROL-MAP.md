@@ -8,7 +8,7 @@ trust the policy with anything.
 | Level | Meaning |
 |---|---|
 | **Hard** | Enforced by Claude Code or the OS below the model. The model cannot talk its way past it. |
-| **Soft** | Enforced by a check that reads the command or tool input as text. It stops the common forms and fails closed on input it cannot parse, but a determined adversary who controls the command text can find a form it does not recognise. |
+| **Soft** | Enforced by a check that reads the command or tool input as text. It stops the common forms and fails closed on input it cannot parse, but a determined adversary who controls the command text can find a form it does not recognize. |
 | **Detective** | Does not stop anything. It makes the action visible afterwards. |
 | **Hygiene** | Housekeeping that reduces exposure but is not a barrier against an adversary. |
 
@@ -61,7 +61,7 @@ The pattern is the point. Everything the hook misses is something a **text check
 everything that covers it is a control that does not read text at all. That is why the sandbox settings are
 required by the linter (rules M020 to M026) and not left as advice.
 
-## Behaviours to know before you deploy
+## Behaviors to know before you deploy
 
 ### Linux glob rules
 
@@ -112,7 +112,7 @@ rather than allows.
 
 ## What this repository does not control
 
-- **Model behaviour.** Nothing here makes the model more or less likely to be manipulated. See the
+- **Model behavior.** Nothing here makes the model more or less likely to be manipulated. See the
   companion project [agent-security-evals](https://github.com/aaron-mcallister/agent-security-evals) for
   measurements of that, and for the finding that a tool-call gate cannot stop attacks whose only effect is
   the text the model writes back.

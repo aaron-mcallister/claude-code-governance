@@ -43,7 +43,8 @@ as code:
 It does **not** stop attacks whose only effect is the text the model writes back (a rendered link, a
 misleading summary). No tool-call gate can. See
 [agent-security-evals](https://github.com/aaron-mcallister/agent-security-evals), the companion project that
-measures this.
+measures this. The same fail-closed approach applied to an MCP server is in
+[hardened-mcp-server](https://github.com/aaron-mcallister/hardened-mcp-server).
 
 The most useful finding from building it: **a malformed `hooks` block in managed settings is silently
 ignored at runtime.** A typo switches the guard off with no error. `claude doctor` reports it; a running
