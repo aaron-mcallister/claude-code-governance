@@ -2,15 +2,19 @@
 
 What was checked, when, on what, and what was **not** checked. Dated so it can go stale honestly.
 
-**Date:** 2026-11-11
-**Claude Code:** 2.1.322 (installed from npm into a scratch directory)
-**Platform:** Linux x64, in a cloud container
+**Date:** 2026-11-11 (local runs), updated 2026-11-12 (GitHub-hosted CI)
+**Claude Code:** 2.1.322 (installed from npm)
+**Platform:** Linux x64, in a cloud container, and a GitHub-hosted `ubuntu-latest` runner
 **Python:** 3.13 (primary), 3.9.25 (the oldest supported, for stock macOS)
 
 ## 1. Unit and contract tests
 
-- `pytest` passes on 3.13, and on 3.9.25 in a separate virtualenv.
-- CI runs the suite on 3.11 and 3.13.
+- `pytest` passes on 3.13, and on 3.9.25 in a separate virtualenv (re-run 2026-11-12 against the current
+  `main`: 338 passed, 1 skipped).
+- CI runs the suite on 3.11 and 3.13. **Python 3.9 is checked by hand, not in CI.** The development
+  dependencies no longer install on 3.9 (pytest 9 requires 3.10 or newer), so the 3.9 run uses
+  `pytest<9`. The hook and linter themselves are standard-library only, and ruff is configured with
+  `target-version = "py39"`, which rejects newer syntax in CI.
 - Coverage includes: the hook on tables of benign and hostile commands, tool-specific cases, a symlink
   case, case-insensitivity, malformed and oversized input, an internal exception, a fuzz over hostile
   command shapes, an AST check that the hook does no I/O, a mutation test per linter rule, and a property
@@ -30,6 +34,21 @@ environment (`env -i`), and fails on any invalid-settings message.
 
 The second row is why the gate exists. A schema error in `hooks` does not stop Claude Code; it removes the
 guard.
+
+## 2a. The same check on a GitHub-hosted runner
+
+The `doctor` CI job runs `scripts/doctor_check.sh` against a pinned `@anthropic-ai/claude-code` install on
+`ubuntu-latest`. Its first two runs failed, and both failures were real defects in the job, not in the
+policy:
+
+1. Installing with `--ignore-scripts` also skips the package's own postinstall, so the native binary was never
+   unpacked and `claude doctor` could not run. `doctor_check.sh` failed on the unexpected output instead of
+   reporting a false pass, which is the behaviour it was written for.
+2. `sudo -E` is ignored on the runner. It was harmless, and was removed.
+
+The fix keeps lifecycle scripts off for the whole dependency tree and runs only the CLI package's own
+`install.cjs`. After it, the `doctor` job passed on the pull request. This is the one place the check has run
+outside the environment where it was written.
 
 Two observations from the same run:
 
