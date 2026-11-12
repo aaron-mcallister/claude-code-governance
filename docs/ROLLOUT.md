@@ -40,7 +40,7 @@ Use `--dry-run` first. The script renders the policy, **refuses to install it if
 error or warning**, backs up an existing policy, installs root-owned files, verifies nothing is writable by
 a non-root user, and prints the SHA-256 of what it wrote.
 
-For a fleet, do not run the script by hand. Render once in CI, then deliver the same two artefacts (the
+For a fleet, do not run the script by hand. Render once in CI, then deliver the same two artifacts (the
 rendered `managed-settings.json` and `hooks/ccg_guard.py`) with your MDM. Claude Code also supports
 server-managed settings; at the time of writing they do not support per-group policy, so check whether that
 fits before choosing it.

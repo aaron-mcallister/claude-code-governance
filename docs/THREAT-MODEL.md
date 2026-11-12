@@ -1,7 +1,7 @@
 # Threat model
 
 Scope: a coding agent (Claude Code) running on a developer's machine, with shell, file and network access,
-working on repositories the developer may not fully trust. The goal is a **baseline an organisation can
+working on repositories the developer may not fully trust. The goal is a **baseline an organization can
 deploy to every developer** without making the tool unusable.
 
 This is a model of the agent on a workstation. It is not a model of the model provider, the network, or the
@@ -37,7 +37,7 @@ Strength is as defined in `docs/CONTROL-MAP.md`: **hard**, **soft**, **detective
 | # | Threat | Adversary | Controls | Strength | Residual risk |
 |---|---|---|---|---|---|
 | T1 | Agent reads a credential file and sends it out | A, C | Deny rules on secret paths; hook blocks secret reads in shell commands; sandbox `denyRead`; sandbox network allowlist | Hard + soft | Glob and indirection tricks (G3, G1) are caught only by the sandbox, and only for shell commands. |
-| T2 | Agent puts a secret in a URL, query or tool argument | A | Hook blocks strong secret patterns in WebFetch, WebSearch and MCP arguments; asks in shell | Soft | Encoded or split secrets are not recognised. |
+| T2 | Agent puts a secret in a URL, query or tool argument | A | Hook blocks strong secret patterns in WebFetch, WebSearch and MCP arguments; asks in shell | Soft | Encoded or split secrets are not recognized. |
 | T3 | Agent makes arbitrary network requests | A, C | Hook denies `curl`, `wget`, `nc` and similar; sandbox domain allowlist | Soft + hard | Programs that happen to speak HTTP (G4, G5). The allowlist covers them for shell commands. |
 | T4 | Repository config runs code or widens permissions on open | B | `allowManagedHooksOnly`; managed MCP allowlist; repo-mode linter in CI and pre-commit | Hard + detective | A repository you do not control cannot be made to run the linter. |
 | T5 | Agent edits the policy, hooks or MCP config to remove a control | A, B, C | Deny rules on those files; hook denies writes to them; files are root-owned at the managed path | Hard + soft | None while the files stay root-owned and managed-only is on. |
